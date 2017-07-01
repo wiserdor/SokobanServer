@@ -6,16 +6,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import sokoban.SokobanSolver;
+
 
 public class CLI extends Observable implements ClientHandler {
 	private ArrayBlockingQueue<String> queue;
 	private volatile boolean isConnected;
 	private String exitString;
+	private Socket aClient;
 
 	public CLI() {
 		queue = new ArrayBlockingQueue<String>(200);
@@ -150,6 +152,42 @@ public class CLI extends Observable implements ClientHandler {
 	}
 
 	@Override
+	public List<String> getSolution(String level) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void ClientIO(Socket aClient, InputStream in, OutputStream out) {
+		try {
+			this.queue = new ArrayBlockingQueue<String>(20);
+			this.queue.clear();
+			this.isConnected = true;
+			this.aClient=aClient;
+
+			// Adapter from InputStream to BufferReader
+			BufferedReader clientInput = new BufferedReader(new InputStreamReader(in));
+			PrintWriter serverOutput = new PrintWriter(out);
+
+			// open a new thread who reading from the client
+			Thread fromClient = aSyncReadInputs(clientInput, "exit");
+			Thread toClient = aSyncSendToClient(serverOutput);
+
+			fromClient.join();
+			toClient.join();
+			clientInput.close();
+			serverOutput.close();
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+}
+
+	/*@Override
 	public List<String> getSolution(String levelName) {
 		String[] cmd=levelName.split(" ");
 		if(cmd[0].toLowerCase()== "solution")
@@ -165,5 +203,5 @@ public class CLI extends Observable implements ClientHandler {
 				//send solution to jersy for reuse
 				return solver.solveAsString();
 				}
-	}
-}
+	}*/
+

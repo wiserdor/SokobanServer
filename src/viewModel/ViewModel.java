@@ -12,23 +12,35 @@ import model.SokobanServer;
 public class ViewModel extends  Observable implements Observer{
 	
 	SokobanServer model;
-	public StringProperty ;
-	public StringProperty ;
+	public StringProperty start ;
+	public StringProperty stop ;
 	public IntegerProperty usersConnected;
 	
 	public ViewModel (SokobanServer model){
 		this.model=model;
-		addUser= new SimpleStringProperty();
-		removeUser = new SimpleStringProperty();
+		start= new SimpleStringProperty();
+		stop= new SimpleStringProperty();
 		usersConnected = new SimpleIntegerProperty();
 	}
 	
+	public ViewModel() {
+		// TODO Auto-generated constructor stub
+	}
+
 	
 	@Override
 	public void update(Observable o, Object arg) {
-		if(o==model){ usersConnected.set(model.getResult());		
+		if(o==model){ usersConnected.set(model.getUsersConnected());	
+		
+		}
 	}
-	
-	
 
+	public void start() {
+		model.start();		
+	}
+
+	public void stop() {
+     model.stopServer();
+}
+	
 }
